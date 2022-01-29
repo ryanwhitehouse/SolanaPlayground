@@ -1,6 +1,6 @@
 <script setup>
 import { computed, ref, toRefs } from 'vue'
-import { useAutoresizeTextarea, useCountCharacterLimit, useSlug } from '@/composables'
+import { useAutoresizeTextarea, useCountCharacterLimit, useSlug, useWorkspace } from '@/composables'
 import { sendTweet } from '@/api'
 import { useWallet } from '@solana/wallet-adapter-vue'
 
@@ -9,6 +9,7 @@ const props = defineProps({
     forcedTopic: String,
 })
 const { forcedTopic } = toRefs(props)
+const workspace = useWorkspace()
 
 // Form data.
 const content = ref('')
@@ -36,7 +37,7 @@ const canTweet = computed(() => content.value && characterLimit.value > 0)
 const emit = defineEmits(['added'])
 const send = async () => {
     if (! canTweet.value) return
-    const tweet = await sendTweet(effectiveTopic.value, content.value)
+    const tweet = await sendTweet(workspace, effectiveTopic.value, content.value)
     emit('added', tweet)
     topic.value = ''
     content.value = ''
